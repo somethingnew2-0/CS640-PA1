@@ -13,13 +13,13 @@ int main(int argc, char * argv[]) {
   int numPackets;
 
   if(argc == 9) {
-    pingerPort  = getFlagValue("-p", argv, true);
+    pingerPort  = getFlagValue("-p", argc, argv, true);
     if(pingerPort == NULL) { return 0; }
-    hostname  = getFlagValue("-s", argv, true);
+    hostname  = getFlagValue("-s", argc, argv, true);
     if(hostname == NULL) { return 0; }
-    reflectorPort  = getFlagValue("-r", argv, true);
+    reflectorPort  = getFlagValue("-r", argc, argv, true);
     if(reflectorPort == NULL) { return 0; }
-    numPacketsStr  = getFlagValue("-n", argv, true);
+    numPacketsStr  = getFlagValue("-n", argc, argv, true);
     if(numPacketsStr == NULL) { return 0; }
     
     numPackets = atoi(numPacketsStr);

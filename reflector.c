@@ -16,14 +16,14 @@ int main(int argc, char *argv[]) {
   int lossProb;
 
   if(argc == 11 || argc == 9 || argc == 7) {
-    reflectorPort = getFlagValue("-p", argv, true);
+    reflectorPort = getFlagValue("-p", argc, argv, true);
     if(reflectorPort == NULL) { return 0; }
-    hostname = getFlagValue("-s", argv, true);
+    hostname = getFlagValue("-s", argc, argv, true);
     if(hostname == NULL) { return 0; }
-    pingerPort = getFlagValue("-g", argv, true);
+    pingerPort = getFlagValue("-g", argc, argv, true);
     if(pingerPort == NULL) { return 0; }
-    delayStr = getFlagValue("-d", argv, false);
-    lossProbStr = getFlagValue("-l", argv, false);
+    delayStr = getFlagValue("-d", argc, argv, false);
+    lossProbStr = getFlagValue("-l", argc, argv, false);
     
     /* If delay or loss probability are not specified set them to 0 */
     delay = (delayStr == NULL) ? 0 : atoi(delayStr);

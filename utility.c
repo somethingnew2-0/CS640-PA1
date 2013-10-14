@@ -2,9 +2,9 @@
 
 #include "utility.h"
 
-char* getFlagValue(char* flag, char* argv[], bool required) {
+char* getFlagValue(char* flag, int argc, char* argv[], bool required) {
   int i;
-  for(i = 1; i < 9; i += 2) {
+  for(i = 1; i < argc; i += 2) {
     if(strcmp(flag, argv[i]) == 0) {
       return argv[i+1];
     }
