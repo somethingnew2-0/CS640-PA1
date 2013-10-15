@@ -3,36 +3,59 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
 #include "host.h"
 #include "utility.h"
 
+bool dropPacket(int lossProb) {
+  return (rand() % 100 + 1) <= lossProb;
+}
+
 int main(int argc, char *argv[]) {
-  char* reflectorPort;
-  char* hostname;
-  char* pingerPort;
-  char* delayStr;
-  char* lossProbStr;
+  char* reflectorPort = NULL;
+  char* hostname = NULL;
+  char* pingerPort = NULL;
+  char* delayStr = NULL;
+  char* lossProbStr = NULL;
   int delay;
   int lossProb;
+  int c;
 
-  if(argc == 11 || argc == 9 || argc == 7) {
-    reflectorPort = getFlagValue("-p", argc, argv, true);
-    if(reflectorPort == NULL) { return 0; }
-    hostname = getFlagValue("-s", argc, argv, true);
-    if(hostname == NULL) { return 0; }
-    pingerPort = getFlagValue("-g", argc, argv, true);
-    if(pingerPort == NULL) { return 0; }
-    delayStr = getFlagValue("-d", argc, argv, false);
-    lossProbStr = getFlagValue("-l", argc, argv, false);
-    
-    /* If delay or loss probability are not specified set them to 0 */
-    delay = (delayStr == NULL) ? 0 : atoi(delayStr);
-    lossProb = (lossProbStr == NULL) ? 0 : atoi(lossProbStr);
+  while((c = getopt(argc, argv, "p:s:g:d:l:")) != -1) {
+    switch (c) {
+    case 'p':
+      reflectorPort = optarg;
+      break;
+    case 's':
+      hostname = optarg;
+      break;
+    case 'g':
+      pingerPort = optarg;
+      break;
+    case 'd':
+      delayStr = optarg;
+      break;
+    case 'l':
+      lossProbStr = optarg;
+      break;
+    case '?':
+      printUsage();
+      return 1;
+    default:
+      exit(EXIT_FAILURE);
+    }
   }
-  else {
-    printUsage();
-    return 0;
-  }
+  
+  checkFlagPresent('p', reflectorPort);
+  checkFlagPresent('s', hostname);
+  checkFlagPresent('g', pingerPort);
+  delay = (delayStr == NULL) ? 0 : atoi(delayStr);
+  lossProb = (lossProbStr == NULL) ? 0 : atoi(lossProbStr);
+
+  /* initialize random seed: */
+  srand(time(NULL));
+
 
   return 0;
 }

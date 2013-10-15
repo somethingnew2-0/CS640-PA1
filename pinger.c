@@ -2,32 +2,46 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <ctype.h>
 #include "host.h"
 #include "utility.h"
 
 int main(int argc, char * argv[]) {
-  char* pingerPort;
-  char* hostname;
-  char* reflectorPort;
-  char* numPacketsStr;
-  int numPackets;
+  char* pingerPort = NULL;
+  char* hostname = NULL;
+  char* reflectorPort = NULL;
+  char* numPacketsStr = NULL;
+  int numPackets = -1;
 
-  if(argc == 9) {
-    pingerPort  = getFlagValue("-p", argc, argv, true);
-    if(pingerPort == NULL) { return 0; }
-    hostname  = getFlagValue("-s", argc, argv, true);
-    if(hostname == NULL) { return 0; }
-    reflectorPort  = getFlagValue("-r", argc, argv, true);
-    if(reflectorPort == NULL) { return 0; }
-    numPacketsStr  = getFlagValue("-n", argc, argv, true);
-    if(numPacketsStr == NULL) { return 0; }
-    
-    numPackets = atoi(numPacketsStr);
+  int c;
+
+  while((c = getopt(argc, argv, "p:s:r:n:")) != -1) {
+    switch (c) {
+    case 'p':
+      pingerPort = optarg;
+      break;
+    case 's':
+      hostname = optarg;
+      break;
+    case 'r':
+      reflectorPort = optarg;
+      break;
+    case 'n':
+      numPacketsStr = optarg;
+      break;
+    case '?':
+      printUsage();
+      return 1;
+    default:
+      exit(EXIT_FAILURE);
+    }
   }
-  else {
-    printUsage();
-    return 0;
-  }
+  
+  checkFlagPresent('p', pingerPort);
+  checkFlagPresent('s', hostname);
+  checkFlagPresent('r', reflectorPort);
+  checkFlagPresent('n', numPacketsStr);
 
   return 0;
 }

@@ -8,6 +8,6 @@
 #include <stdbool.h>
 #include "host.h"
 
-char* getFlagValue(char* flag, int argc, char* argv[], bool required);
+void checkFlagPresent(char flag, char* value);
 
 #endif /* UTILITY_H_ */

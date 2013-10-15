@@ -2,17 +2,10 @@
 
 #include "utility.h"
 
-char* getFlagValue(char* flag, int argc, char* argv[], bool required) {
-  int i;
-  for(i = 1; i < argc; i += 2) {
-    if(strcmp(flag, argv[i]) == 0) {
-      return argv[i+1];
-    }
-  }
-
-  if(required) {
+void checkFlagPresent(char flag, char* value) {
+  if(value == NULL) {
     printUsage();
-    printf("Missing %s flag\n", flag);
+    printf("Missing -%c option.\n", flag);
+    exit(EXIT_FAILURE);
   }
-  return NULL;
 }
