@@ -15,3 +15,7 @@
 *.exe
 *.out
 *.app
+
+# Our resultant binaries
+pinger
+reflector
