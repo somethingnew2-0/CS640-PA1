@@ -2,13 +2,12 @@
 /* enqueue, and dequeue*/
 #include <stdio.h>
 #include <stdlib.h>
-#include "job.h"
 #include "queue.h"
 
 /* A node in a linked list */
 typedef struct node {
-	/* a job of the node */
-	Job * job;
+	/* a Packet of the node */
+	Packet * Packet;
 
 	/* the next node in the list */
 	struct node * next;
@@ -52,9 +51,9 @@ void deallocate(Queue * queue){
 /* Links the given item into the queue and returns the queue size.
  * Returns -1 if bad data is passed in.
  */
-int enqueue(Queue * queue, Job * job){
+int enqueue(Queue * queue, Packet * packet){
 	Node * node;
-	if(NULL == queue || NULL == job){
+	if(NULL == queue || NULL == packet){
 		return -1;
 	}
 	node = (Node *)malloc(sizeof(Node));
@@ -64,7 +63,7 @@ int enqueue(Queue * queue, Job * job){
 	}
 
 	/* link in the created node */
-	node->job = job;
+	node->packet = packet;
 	node->next = NULL;
 	if(queue->size == 0){
 		queue->head = node;
@@ -80,14 +79,14 @@ int enqueue(Queue * queue, Job * job){
 
 /* Takes an item from the head of the queue and returns it. The pointer to*/
 /* head is incremented.*/
-Job * dequeue(Queue * queue){
+Packet * dequeue(Queue * queue){
 	Node * temp;
-	Job * job;
+	Packet * packet;
 	if(NULL == queue || 0 == queue->size){
 		return NULL;
 	}
 	temp = queue->head;
-	job = temp->job;
+	packet = temp->packet;
 	queue->head = temp->next;
 	free(temp);
 	queue->size--;
@@ -95,5 +94,5 @@ Job * dequeue(Queue * queue){
 		queue->head = NULL;
 		queue->tail = NULL;
 	}
-	return job;
+	return packet;
 }
