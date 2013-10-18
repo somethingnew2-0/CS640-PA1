@@ -2,11 +2,12 @@
 #ifndef PACKET_H_
 #define PACKET_H_
 
+#include <stdint.h>
 #include "utility.h"
 
 struct packet {
   /* The 32 bit sequence. Set so first bit is 1 */
-  unsigned long sequence;
+  uint32_t sequence;
 
   /* Time in microseconds */
   long timestamp;
