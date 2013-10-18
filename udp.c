@@ -1,18 +1,19 @@
 #include "udp.h"
 
-// create a socket and bind it to a port on the current machine
-// used to listen for incoming packets
+/* create a socket and bind it to a port on the current machine
+   used to listen for incoming packets */
 int
 UDP_Open(int port)
 {
     int fd;
+    struct sockaddr_in myaddr;
+
     if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
 	perror("socket");
 	return 0;
     }
 
-    // set up the bind
-    struct sockaddr_in myaddr;
+    /* set up the bind */
     bzero(&myaddr, sizeof(myaddr));
 
     myaddr.sin_family      = AF_INET;
@@ -25,24 +26,25 @@ UDP_Open(int port)
 	return -1;
     }
 
-    // give back descriptor
+    /* give back descriptor */
     return fd;
 }
 
-// fill sockaddr_in struct with proper goodies
+/* fill sockaddr_in struct with proper goodies */
 int
 UDP_FillSockAddr(struct sockaddr_in *addr, char *hostName, int port)
 {
-    bzero(addr, sizeof(struct sockaddr_in));
-    if (hostName == NULL) {
-	return 0; // it's OK just to clear the address
-    }
-    
-    addr->sin_family = AF_INET;          // host byte order
-    addr->sin_port   = htons(port);      // short, network byte order
-
     struct in_addr *inAddr;
     struct hostent *hostEntry;
+
+    bzero(addr, sizeof(struct sockaddr_in));
+    if (hostName == NULL) {
+      return 0; /* it's OK just to clear the address */
+    }
+    
+    addr->sin_family = AF_INET;          /* host byte order */
+    addr->sin_port   = htons(port);      /* short, network byte order */
+
     if ((hostEntry = gethostbyname(hostName)) == NULL) {
 	perror("gethostbyname");
 	return -1;
@@ -50,7 +52,7 @@ UDP_FillSockAddr(struct sockaddr_in *addr, char *hostName, int port)
     inAddr = (struct in_addr *) hostEntry->h_addr;
     addr->sin_addr = *inAddr;
 
-    // all is good
+    /* all is good */
     return 0;
 }
 
@@ -67,7 +69,7 @@ UDP_Read(int fd, struct sockaddr_in *addr, char *buffer, int n)
 {
     int len = sizeof(struct sockaddr_in); 
     int rc = recvfrom(fd, buffer, n, 0, (struct sockaddr *) addr, (socklen_t *) &len);
-    // assert(len == sizeof(struct sockaddr_in)); 
+    /* assert(len == sizeof(struct sockaddr_in)); */
     return rc;
 }
 

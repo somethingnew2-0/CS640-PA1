@@ -14,3 +14,5 @@ reflector.o : reflector.c host.h utility.h udp.h
 	$(CC) $(FLAGS) reflector.c
 utility.o : utility.c host.h
 	$(CC) $(FLAGS) utility.c
+udp.o : udp.c udp.h
+	$(CC) $(FLAGS) udp.c
