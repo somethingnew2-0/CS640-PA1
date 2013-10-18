@@ -9,8 +9,6 @@
 #include <stdbool.h>
 #include "host.h"
 
-typedef struct packet Packet;
-
 void checkFlagPresent(char flag, char* value);
 
 #endif /* UTILITY_H_ */

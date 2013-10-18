@@ -1,18 +1,20 @@
 CC = gcc
 FLAGS = -g -c -pedantic -Wall
 
-default : pinger.o reflector.o utility.o udp.o
-	$(CC) -o pinger pinger.o utility.o udp.o
-	$(CC) -o reflector reflector.o utility.o udp.o
+default : pinger.o reflector.o utility.o udp.o packet.o
+	$(CC) -o pinger pinger.o utility.o udp.o packet.o
+	$(CC) -o reflector reflector.o utility.o udp.o packet.o
 
 clean :
 	rm -f pinger reflector *.o *~
 
-pinger.o : pinger.c host.h utility.h udp.h
+pinger.o : pinger.c host.h utility.h udp.h packet.h
 	$(CC) $(FLAGS) pinger.c
-reflector.o : reflector.c host.h utility.h udp.h
+reflector.o : reflector.c host.h utility.h udp.h packet.h
 	$(CC) $(FLAGS) reflector.c
 utility.o : utility.c host.h
 	$(CC) $(FLAGS) utility.c
 udp.o : udp.c udp.h
 	$(CC) $(FLAGS) udp.c
+packet.o: packet.c packet.h
+	$(CC) $(FLAGS) packet.c

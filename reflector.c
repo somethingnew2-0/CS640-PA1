@@ -4,6 +4,7 @@
 #include "host.h"
 #include "utility.h"
 #include "udp.h"
+#include "packet.h"
 
 bool dropPacket(int lossProb) {
   return (rand() % 100 + 1) <= lossProb;
@@ -19,6 +20,8 @@ int main(int argc, char *argv[]) {
   int pingerPort;
   int delay;
   int lossProb;
+
+  Packet * packet = (Packet*)malloc(sizeof(Packet));
 
   struct sockaddr_in* pingerAddr = 
     (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
@@ -42,11 +45,9 @@ int main(int argc, char *argv[]) {
     case 'l':
       lossProbStr = optarg;
       break;
-    case '?':
+    default:
       printUsage();
       return 1;
-    default:
-      exit(EXIT_FAILURE);
     }
   }
   
@@ -70,11 +71,11 @@ int main(int argc, char *argv[]) {
     printf("UDP_Fill error\n");
     return 1;
   }
-  if(UDP_Read(fd, pingerAddr, NULL, 0) < 0) {
+  if(UDP_Read(fd, pingerAddr, packet, sizeof(Packet)) < 0) {
     printf("Read error\n");
     return 1;
   }
-  printf("Packet received\n");
+  printf("Packet received %lu\n", getPacketSequence(packet));
   
   UDP_Close(fd);
   return 0;

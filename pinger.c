@@ -4,6 +4,7 @@
 #include "host.h"
 #include "utility.h"
 #include "udp.h"
+#include "packet.h"
 
 int main(int argc, char * argv[]) {
   char* pingerPortStr = NULL;
@@ -14,6 +15,7 @@ int main(int argc, char * argv[]) {
   int reflectorPort;
   int numPackets;
 
+  Packet * packet;
   struct sockaddr_in* reflectorAddr = 
     (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
   int fd;
@@ -56,7 +58,8 @@ int main(int argc, char * argv[]) {
     printf("UDP_Fill error\n");
     return 1;
   }
-  if(UDP_Write(fd, reflectorAddr, NULL, 0) < 0) {
+  packet = createPacket(0);
+  if(UDP_Write(fd, reflectorAddr, packet, sizeof(Packet)) < 0) {
     printf("Send error\n");
     return 1;
   }
