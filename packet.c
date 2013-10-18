@@ -17,25 +17,17 @@ Packet * createPacket(int num) {
     exit(EXIT_FAILURE);
   }
 
-  gettimeofday(&currentTime, NULL);
+  if(gettimeofday(&currentTime, NULL) < 0) {
+    printf("gettimeofday error");
+    exit(EXIT_FAILURE);
+  }
   packet->sequence = 2147483648L + num;
-  packet->timestamp = currentTime;
+  /* Need to convert tv_sec to microseconds and add the remaining usec. */
+  packet->timestamp = currentTime.tv_sec*1000000 + currentTime.tv_usec;
   
   return packet;
 }
 
 void destroyPacket(Packet * packet) {
   free(packet);
-}
-
-struct timeval getPacketTimeval(Packet * packet) {
-  return packet->timestamp;
-}
-
-long getPacketTimestamp(Packet * packet) {
-  return (long)((packet->timestamp).tv_usec);
-}
-
-unsigned long getPacketSequence(Packet * packet) {
-  return packet->sequence;
 }

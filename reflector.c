@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
     printf("Read error\n");
     return 1;
   }
-  printf("Packet received %lu\n", getPacketSequence(packet));
+  printf("Packet received %lu\n", packet->timestamp);
   
   UDP_Close(fd);
   return 0;

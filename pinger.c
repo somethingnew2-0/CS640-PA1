@@ -64,7 +64,6 @@ int main(int argc, char * argv[]) {
     return 1;
   }
   printf("Packet sent\n");
-  
   UDP_Close(fd);
 
   return 0;
