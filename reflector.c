@@ -11,7 +11,7 @@ bool dropPacket(int lossProb) {
   return (rand() % 100 + 1) <= lossProb;
 }
 
-int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay) {
+int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossProb) {
   fd_set fds;
   FD_ZERO(&fds);
   FD_SET(fd, &fds);
@@ -30,18 +30,23 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay) {
   /* No data since timeout */        
   else if (rc == 0) {
     QueuedPacket* queuedPacket = dequeue(queue);
-    if(UDP_Write(fd, pingerAddr, queuedPacket->packet, sizeof(Packet)) < 0) {
-      printf("Send error\n");
-      return 1;
+    if(dropPacket(lossProb)) {
+      printf("Packet dropped\n");
     }
-    printf("Packet sent\n");
+    else { 
+      if(UDP_Write(fd, pingerAddr, queuedPacket->packet, sizeof(Packet)) < 0) {
+        printf("Send error\n");
+        return 1;
+      }
+      printf("Packet sent\n");
+    }
 
     if(queue->size == 0) {
       deallocate(queue);
       return 0;
     }
     else {
-      return reflector(fd, pingerAddr, queue, delay);
+      return reflector(fd, pingerAddr, queue, delay, lossProb);
     }
   }
   /* Data is available */
@@ -54,7 +59,7 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay) {
     printf("Packet received %lu\n", packet->timestamp);
     enqueue(queue, createQueuedPacket(packet));
     
-    return reflector(fd, pingerAddr, queue, delay);
+    return reflector(fd, pingerAddr, queue, delay, lossProb);
   }  
 }
 
@@ -126,7 +131,7 @@ int main(int argc, char *argv[]) {
   printf("Packet received %lu\n", packet->timestamp);
   enqueue(queue, createQueuedPacket(packet));
 
-  if(reflector(fd, pingerAddr, queue, delay) != 0)  {
+  if(reflector(fd, pingerAddr, queue, delay, lossProb) != 0)  {
     printf("Reflector error\n");
     return 1;
   }
