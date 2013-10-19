@@ -58,24 +58,59 @@ int main(int argc, char * argv[]) {
     return 1;
   }
 
-  for (int i = 0; i < numPackets; i++) {
-    Packet* packet = createPacket(i);
-    if(UDP_Write(fd, reflectorAddr, packet, sizeof(Packet)) < 0) {
-      printf("Send error\n");
-      return 1;
-    }
-    printf("Packet sent from pinger\n");
-    destroyPacket(packet);
-  }
 
-  for (int i = 0; i < numPackets; i++) {
-    Packet * packet = (Packet*)malloc(sizeof(Packet));
-    if(UDP_Read(fd, reflectorAddr, packet, sizeof(Packet)) < 0) {
-      printf("Read error\n");
-      return 1;
+
+  int packetsSent = 0, packetsRecieved = 0;
+  while(packetsSent < numPackets && packetsRecieved < numPackets) {
+    if(packetsSent < numPackets) {
+      fd_set fds;
+      FD_ZERO(&fds);
+      FD_SET(fd, &fds);
+      
+      /* Set time limit. */
+      struct timeval timeout;
+      timeout.tv_sec = 1;
+      timeout.tv_usec = 0;
+      
+      /* Create a descriptor set containing our two sockets.  */
+      int rc = select(fd+1, &fds, NULL, NULL, &timeout);
+            
+      /* select error */
+      if(rc < 0) {
+        return -1;
+      }
+      /* No data since timeout */        
+      else if (rc == 0) {
+        Packet* packet = createPacket(packetsSent++);
+        if(UDP_Write(fd, reflectorAddr, packet, sizeof(Packet)) < 0) {
+          printf("Send error\n");
+          return 1;
+        }
+        printf("Packet sent from pinger\n");
+        destroyPacket(packet);
+      }
+      /* Data is available */
+      else {
+        Packet * packet = (Packet*)malloc(sizeof(Packet));
+        if(UDP_Read(fd, reflectorAddr, packet, sizeof(Packet)) < 0) {
+          printf("Read error\n");
+          return 1;
+        }
+        printf("Packet received from reflector %lu\n", packet->timestamp);
+        destroyPacket(packet);
+        packetsRecieved++;
+      }
     }
-    printf("Packet received from reflector %lu\n", packet->timestamp);
-    destroyPacket(packet);
+    else {
+        Packet * packet = (Packet*)malloc(sizeof(Packet));
+        if(UDP_Read(fd, reflectorAddr, packet, sizeof(Packet)) < 0) {
+          printf("Read error\n");
+          return 1;
+        }
+        printf("Packet received from reflector %lu\n", packet->timestamp);
+        destroyPacket(packet);
+        packetsRecieved++;
+    }
   }
   UDP_Close(fd);
 
