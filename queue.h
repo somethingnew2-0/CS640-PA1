@@ -5,6 +5,6 @@ typedef struct queue Queue;
 
 Queue * allocate();
 void deallocate(Queue *queue);
-int enqueue(Queue *queue, Packet * packet);
-Packet * dequeue(Queue *queue);
-Packet * peek(Queue *queue);
+int enqueue(Queue *queue, QueuedPacket * packet);
+QueuedPacket * dequeue(Queue *queue);
+QueuedPacket * peek(Queue *queue);

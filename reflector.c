@@ -39,7 +39,7 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay) {
       return 1;
     }
     printf("Packet received %lu\n", packet->timestamp);
-    enqueue(queue, packet);
+    enqueue(queue, createQueuedPacket(packet));
     
     return reflector(fd, pingerAddr, queue, delay);
   }  
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
   printf("Packet received %lu\n", packet->timestamp);
-  enqueue(queue, packet);
+  enqueue(queue, createQueuedPacket(packet));
 
   if(reflector(fd, pingerAddr, queue, delay) != 0)  {
     printf("Reflector error\n");

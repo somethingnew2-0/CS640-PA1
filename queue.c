@@ -8,7 +8,7 @@
 /* A node in a linked list */
 typedef struct node {
 	/* a Packet of the node */
-	Packet * packet;
+	QueuedPacket * packet;
 
 	/* the next node in the list */
 	struct node * next;
@@ -52,7 +52,7 @@ void deallocate(Queue * queue){
 /* Links the given item into the queue and returns the queue size.
  * Returns -1 if bad data is passed in.
  */
-int enqueue(Queue * queue, Packet * packet){
+int enqueue(Queue * queue, QueuedPacket * packet){
 	Node * node;
 	if(NULL == queue || NULL == packet){
 		return -1;
@@ -81,9 +81,9 @@ int enqueue(Queue * queue, Packet * packet){
 /* Takes an item from the head of the queue and returns it. The pointer to
  * head is incremented.
  */
-Packet * dequeue(Queue * queue){
+QueuedPacket * dequeue(Queue * queue){
 	Node * temp;
-	Packet * packet;
+	QueuedPacket * packet;
 	if(NULL == queue || 0 == queue->size){
 		return NULL;
 	}
@@ -102,7 +102,7 @@ Packet * dequeue(Queue * queue){
 /* Peeks at an item from the head of the queue and returns it. The pointer to
  * head is unaffected.
  */
-Packet * peek(Queue * queue){
+QueuedPacket * peek(Queue * queue){
 	if(NULL == queue || 0 == queue->size){
 		return NULL;
 	}

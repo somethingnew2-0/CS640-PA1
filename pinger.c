@@ -59,12 +59,13 @@ int main(int argc, char * argv[]) {
   }
 
   for (int i = 0; i < numPackets; i++) {
-    Packet* packet = createPacket(0);
+    Packet* packet = createPacket(i);
     if(UDP_Write(fd, reflectorAddr, packet, sizeof(Packet)) < 0) {
       printf("Send error\n");
       return 1;
     }
     printf("Packet sent\n");
+    destroyPacket(packet);
   }
   UDP_Close(fd);
 

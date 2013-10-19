@@ -15,7 +15,19 @@ struct packet {
 
 typedef struct packet Packet;
 
+struct queuedpacket
+{
+	Packet* packet;
+
+	/* Time in microseconds this packet was queued */
+	long timestamp;
+};
+
+typedef struct queuedpacket QueuedPacket;
+
+
 Packet* createPacket(int num);
+QueuedPacket* createQueuedPacket(Packet* packet);
 void destroyPacket(Packet * packet);
 
 #endif
