@@ -21,10 +21,6 @@ int main(int argc, char *argv[]) {
   int delay;
   int lossProb;
 
-  Packet * packet = (Packet*)malloc(sizeof(Packet));
-
-  int fd;
-  
   int c;
   while((c = getopt(argc, argv, "p:s:g:d:l:")) != -1) {
     switch (c) {
@@ -59,7 +55,7 @@ int main(int argc, char *argv[]) {
 
   /* initialize random seed: */
   /*srand(time(NULL));*/
-
+  int fd;
   if((fd = UDP_Open(reflectorPort)) <= 0) {
     printf("UDP_Open error\n");
     return 1;
@@ -71,6 +67,8 @@ int main(int argc, char *argv[]) {
     printf("UDP_Fill error\n");
     return 1;
   }
+
+  Packet * packet = (Packet*)malloc(sizeof(Packet));
   if(UDP_Read(fd, pingerAddr, packet, sizeof(Packet)) < 0) {
     printf("Read error\n");
     return 1;
