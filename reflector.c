@@ -25,10 +25,17 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
   
   struct timeval timeout;
   /* Set time limit. */
-  timeout.tv_sec = 0;
-  timeout.tv_usec = (delay - (getTimestamp() - peek(queue)->timestamp)) * 1000;
-  if(timeout.tv_usec < 0) {
-    timeout.tv_usec = 0;
+  
+  if(queue->size > 0) {
+    timeout.tv_sec = 0;
+    timeout.tv_usec = (delay - (getTimestamp() - peek(queue)->timestamp)) * 1000;
+    if(timeout.tv_usec < 0) {
+      timeout.tv_usec = 0;
+    }
+  }
+  else {
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 1500000;
   }
   /* Create a descriptor set containing our two sockets.  */
   int rc = select(fd+1, &fds, NULL, NULL, &timeout);
@@ -39,25 +46,24 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
   }
   /* No data since timeout */        
   else if (rc == 0) {
-    QueuedPacket* queuedPacket = dequeue(queue);
-    printPacketInfo(queuedPacket);
-    if(dropPacket(lossProb)) {
-      printf("Packet dropped\n");
-    }
-    else { 
-      if(UDP_Write(fd, pingerAddr, queuedPacket->packet, sizeof(Packet)) < 0) {
-        printf("Send error\n");
-        return 1;
+    if(queue->size > 0) {
+      QueuedPacket* queuedPacket = dequeue(queue);
+      printPacketInfo(queuedPacket);
+      if(dropPacket(lossProb)) {
+        printf("Packet dropped\n");
       }
-      printf("Packet not dropped\n");
-    }
-    destroyQueuedPacket(queuedPacket);
-
-    if(queue->size == 0) {
-      return 0;
+      else { 
+        if(UDP_Write(fd, pingerAddr, queuedPacket->packet, sizeof(Packet)) < 0) {
+          printf("Send error\n");
+          return 1;
+        }
+        printf("Packet not dropped\n");
+      }
+      destroyQueuedPacket(queuedPacket);
+      return reflector(fd, pingerAddr, queue, delay, lossProb);
     }
     else {
-      return reflector(fd, pingerAddr, queue, delay, lossProb);
+      return 0;
     }
   }
   /* Data is available */
