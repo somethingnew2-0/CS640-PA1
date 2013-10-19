@@ -61,7 +61,7 @@ int main(int argc, char * argv[]) {
 
 
   int packetsSent = 0, packetsRecieved = 0;
-  while(packetsSent < numPackets && packetsRecieved < numPackets) {
+  while(packetsSent < numPackets || packetsRecieved < numPackets) {
     if(packetsSent < numPackets) {
       fd_set fds;
       FD_ZERO(&fds);
