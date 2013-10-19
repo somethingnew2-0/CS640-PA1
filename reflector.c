@@ -11,6 +11,12 @@ bool dropPacket(int lossProb) {
   return (rand() % 100 + 1) <= lossProb;
 }
 
+void printPacketInfo(QueuedPacket * queuedPacket) {
+  printf("Packet Received\n");
+  printf("Time: %lu\n", queuedPacket->timestamp);
+  printf("Sequence #: %lu\n", (unsigned long)queuedPacket->packet->sequence);
+}
+
 int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossProb) {
   fd_set fds;
   FD_ZERO(&fds);
@@ -33,6 +39,7 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
   /* No data since timeout */        
   else if (rc == 0) {
     QueuedPacket* queuedPacket = dequeue(queue);
+    printPacketInfo(queuedPacket);
     if(dropPacket(lossProb)) {
       printf("Packet dropped\n");
     }
@@ -59,7 +66,6 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
       printf("Read error\n");
       return 1;
     }
-    printf("Packet received from pinger %lu\n", packet->timestamp);
     enqueue(queue, createQueuedPacket(packet));
     
     return reflector(fd, pingerAddr, queue, delay, lossProb);
@@ -131,7 +137,6 @@ int main(int argc, char *argv[]) {
     printf("Read error\n");
     return 1;
   }
-  printf("Packet received from pinger %lu\n", packet->timestamp);
   enqueue(queue, createQueuedPacket(packet));
 
   if(reflector(fd, pingerAddr, queue, delay, lossProb) != 0)  {

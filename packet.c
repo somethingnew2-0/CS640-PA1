@@ -31,7 +31,7 @@ QueuedPacket* createQueuedPacket(Packet* packet) {
 
   QueuedPacket* queuedPacket = (QueuedPacket *)malloc(sizeof(QueuedPacket));
   queuedPacket->packet = packet;
-  packet->timestamp = getTimestamp();
+  queuedPacket->timestamp = getTimestamp();
 
   return queuedPacket;
 }
