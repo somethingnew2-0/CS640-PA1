@@ -14,6 +14,7 @@ bool dropPacket(int lossProb) {
 void printPacketInfo(QueuedPacket * queuedPacket) {
   printf("Packet Received\n");
   printf("Time: %lu\n", queuedPacket->timestamp);
+  printf("Pinger IP: %lu\n", (unsigned long)queuedPacket->ipAddress);
   printf("Sequence #: %lu\n", (unsigned long)queuedPacket->packet->sequence);
 }
 
@@ -48,7 +49,7 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
         printf("Send error\n");
         return 1;
       }
-      printf("Packet sent from relector\n");
+      printf("Packet not dropped\n");
     }
     destroyQueuedPacket(queuedPacket);
 
@@ -66,7 +67,7 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
       printf("Read error\n");
       return 1;
     }
-    enqueue(queue, createQueuedPacket(packet));
+    enqueue(queue, createQueuedPacket(packet, pingerAddr));
     
     return reflector(fd, pingerAddr, queue, delay, lossProb);
   }  
@@ -137,7 +138,7 @@ int main(int argc, char *argv[]) {
     printf("Read error\n");
     return 1;
   }
-  enqueue(queue, createQueuedPacket(packet));
+  enqueue(queue, createQueuedPacket(packet, pingerAddr));
 
   if(reflector(fd, pingerAddr, queue, delay, lossProb) != 0)  {
     printf("Reflector error\n");

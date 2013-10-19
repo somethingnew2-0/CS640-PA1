@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include "utility.h"
+#include "udp.h"
 
 typedef struct packet {
   /* The 32 bit sequence. Set so first bit is 1 */
@@ -15,15 +16,17 @@ typedef struct packet {
 
 typedef struct queuedpacket
 {
-	Packet* packet;
+  Packet* packet;
 
-	/* Time in microseconds this packet was queued */
-	long timestamp;
+  /* Time in microseconds this packet was queued */
+  long timestamp;
+  
+  uint32_t ipAddress;
 } QueuedPacket;
 
 
 Packet* createPacket(int num);
-QueuedPacket* createQueuedPacket(Packet* packet);
+QueuedPacket* createQueuedPacket(Packet* packet, SockAddr* sockaddr);
 void destroyQueuedPacket(QueuedPacket * packet);
 void destroyPacket(Packet * packet);
 

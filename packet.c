@@ -23,7 +23,7 @@ Packet* createPacket(int num) {
 }
 
 /* Creates a new queued packet at the current time */
-QueuedPacket* createQueuedPacket(Packet* packet) {
+QueuedPacket* createQueuedPacket(Packet* packet, SockAddr* sockAddr) {
   if(packet == NULL) {
     printf("null packet error");
     return NULL;
@@ -32,6 +32,7 @@ QueuedPacket* createQueuedPacket(Packet* packet) {
   QueuedPacket* queuedPacket = (QueuedPacket *)malloc(sizeof(QueuedPacket));
   queuedPacket->packet = packet;
   queuedPacket->timestamp = getTimestamp();
+  queuedPacket->ipAddress = (sockAddr->sin_addr).s_addr;
 
   return queuedPacket;
 }
