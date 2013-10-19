@@ -10,5 +10,6 @@
 #include "host.h"
 
 void checkFlagPresent(char flag, char* value);
+long getTimestamp();
 
 #endif /* UTILITY_H_ */

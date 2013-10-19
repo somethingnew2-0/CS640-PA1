@@ -18,7 +18,7 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay) {
   
   struct timeval timeout;
   /* Set time limit. */
-  timeout.tv_sec = delay;
+  timeout.tv_sec = peek(queue)->timestamp - delay;
   timeout.tv_usec = 0;
   /* Create a descriptor set containing our two sockets.  */
   int rc = select(fd+1, &fds, NULL, NULL, &timeout);

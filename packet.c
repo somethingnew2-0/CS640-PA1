@@ -15,14 +15,9 @@ Packet* createPacket(int num) {
     exit(EXIT_FAILURE);
   }
 
-  struct timeval currentTime;
-  if(gettimeofday(&currentTime, NULL) < 0) {
-    printf("gettimeofday error");
-    exit(EXIT_FAILURE);
-  }
   packet->sequence = 2147483648L + num;
-  /* Need to convert tv_sec to microseconds and add the remaining usec. */
-  packet->timestamp = currentTime.tv_sec*1000000 + currentTime.tv_usec;
+  
+  packet->timestamp = getTimestamp();
   
   return packet;
 }
@@ -36,15 +31,7 @@ QueuedPacket* createQueuedPacket(Packet* packet) {
 
   QueuedPacket* queuedPacket = (QueuedPacket *)malloc(sizeof(QueuedPacket));
   queuedPacket->packet = packet;
-
-  struct timeval currentTime;
-  if(gettimeofday(&currentTime, NULL) < 0) {
-    printf("gettimeofday error");
-    exit(EXIT_FAILURE);
-  }
-
-  /* Need to convert tv_sec to microseconds and add the remaining usec. */
-  packet->timestamp = currentTime.tv_sec*1000000 + currentTime.tv_usec;
+  packet->timestamp = getTimestamp();
 
   return queuedPacket;
 }
