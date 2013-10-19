@@ -5,26 +5,6 @@
 #include <stdlib.h>
 #include "queue.h"
 
-/* A node in a linked list */
-typedef struct node {
-	/* a Packet of the node */
-	QueuedPacket * packet;
-
-	/* the next node in the list */
-	struct node * next;
-}Node;
-
-struct queue {
-	/* the size of the queue */
-	int size;
-
-	/* a pointer to the head of the queue */
-	Node * head;
-
-	/* a pointer to the tail of the queue */
-	Node * tail;
-};
-
 /* Allocates memory for the queue and sets initial values */
 Queue * allocate(){
 	Queue * queue = (Queue *)malloc(sizeof(Queue));

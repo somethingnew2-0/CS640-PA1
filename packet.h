@@ -5,25 +5,21 @@
 #include <stdint.h>
 #include "utility.h"
 
-struct packet {
+typedef struct packet {
   /* The 32 bit sequence. Set so first bit is 1 */
   uint32_t sequence;
 
   /* Time in microseconds */
   long timestamp;
-};
+} Packet;
 
-typedef struct packet Packet;
-
-struct queuedpacket
+typedef struct queuedpacket
 {
 	Packet* packet;
 
 	/* Time in microseconds this packet was queued */
 	long timestamp;
-};
-
-typedef struct queuedpacket QueuedPacket;
+} QueuedPacket;
 
 
 Packet* createPacket(int num);

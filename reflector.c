@@ -18,7 +18,7 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay) {
   
   struct timeval timeout;
   /* Set time limit. */
-  timeout.tv_sec = peek(queue)->timestamp - delay;
+  timeout.tv_sec = (getTimestamp() - peek(queue)->timestamp) - delay;
   timeout.tv_usec = 0;
   /* Create a descriptor set containing our two sockets.  */
   int rc = select(fd+1, &fds, NULL, NULL, &timeout);
@@ -27,9 +27,22 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay) {
   if(rc < 0) {
     return -1;
   }
-  /* No data in timeout */        
+  /* No data since timeout */        
   else if (rc == 0) {
-    return -1;
+    QueuedPacket* queuedPacket = dequeue(queue);
+    if(UDP_Write(fd, pingerAddr, queuedPacket->packet, sizeof(Packet)) < 0) {
+      printf("Send error\n");
+      return 1;
+    }
+    printf("Packet sent\n");
+
+    if(queue->size == 0) {
+      deallocate(queue);
+      return 0;
+    }
+    else {
+      return reflector(fd, pingerAddr, queue, delay);
+    }
   }
   /* Data is available */
   else {
