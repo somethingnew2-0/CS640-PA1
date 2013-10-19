@@ -23,11 +23,9 @@ int main(int argc, char *argv[]) {
 
   Packet * packet = (Packet*)malloc(sizeof(Packet));
 
-  struct sockaddr_in* pingerAddr = 
-    (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
   int fd;
+  
   int c;
-
   while((c = getopt(argc, argv, "p:s:g:d:l:")) != -1) {
     switch (c) {
     case 'p':
@@ -66,6 +64,8 @@ int main(int argc, char *argv[]) {
     printf("UDP_Open error\n");
     return 1;
   }
+  
+  SockAddr* pingerAddr = (SockAddr*)malloc(sizeof(SockAddr));
   printf("Open socket\n");
   if(UDP_FillSockAddr(pingerAddr, hostname, pingerPort) != 0) {
     printf("UDP_Fill error\n");

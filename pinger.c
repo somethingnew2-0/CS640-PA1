@@ -51,8 +51,7 @@ int main(int argc, char * argv[]) {
     return 1;
   }
 
-  struct sockaddr_in* reflectorAddr = 
-    (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
+  SockAddr* reflectorAddr =  (SockAddr*)malloc(sizeof(SockAddr));
   printf("Open socket\n");
   if(UDP_FillSockAddr(reflectorAddr, hostname, reflectorPort) != 0) {
     printf("UDP_Fill error\n");
