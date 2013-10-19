@@ -67,6 +67,16 @@ int main(int argc, char * argv[]) {
     printf("Packet sent from pinger\n");
     destroyPacket(packet);
   }
+
+  for (int i = 0; i < numPackets; i++) {
+    Packet * packet = (Packet*)malloc(sizeof(Packet));
+    if(UDP_Read(fd, reflectorAddr, packet, sizeof(Packet)) < 0) {
+      printf("Read error\n");
+      return 1;
+    }
+    printf("Packet received from reflector %lu\n", packet->timestamp);
+    destroyPacket(packet);
+  }
   UDP_Close(fd);
 
   return 0;

@@ -36,6 +36,11 @@ QueuedPacket* createQueuedPacket(Packet* packet) {
   return queuedPacket;
 }
 
+void destroyQueuedPacket(QueuedPacket* packet) {
+  destroyPacket(packet->packet);
+  free(packet);
+}
+
 void destroyPacket(Packet* packet) {
   free(packet);
 }

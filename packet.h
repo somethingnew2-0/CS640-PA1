@@ -24,6 +24,7 @@ typedef struct queuedpacket
 
 Packet* createPacket(int num);
 QueuedPacket* createQueuedPacket(Packet* packet);
+void destroyQueuedPacket(QueuedPacket * packet);
 void destroyPacket(Packet * packet);
 
 #endif

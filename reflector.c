@@ -43,6 +43,7 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
       }
       printf("Packet sent from relector\n");
     }
+    destroyQueuedPacket(queuedPacket);
 
     if(queue->size == 0) {
       deallocate(queue);
@@ -59,7 +60,7 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
       printf("Read error\n");
       return 1;
     }
-    printf("Packet received %lu\n", packet->timestamp);
+    printf("Packet received from pinger %lu\n", packet->timestamp);
     enqueue(queue, createQueuedPacket(packet));
     
     return reflector(fd, pingerAddr, queue, delay, lossProb);
