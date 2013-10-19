@@ -64,7 +64,7 @@ int main(int argc, char * argv[]) {
       printf("Send error\n");
       return 1;
     }
-    printf("Packet sent\n");
+    printf("Packet sent from pinger\n");
     destroyPacket(packet);
   }
   UDP_Close(fd);

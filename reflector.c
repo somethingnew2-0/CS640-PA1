@@ -18,8 +18,11 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
   
   struct timeval timeout;
   /* Set time limit. */
-  timeout.tv_sec = (getTimestamp() - peek(queue)->timestamp) - delay;
-  timeout.tv_usec = 0;
+  timeout.tv_sec = 0;
+  timeout.tv_usec = (delay - (getTimestamp() - peek(queue)->timestamp)) * 1000;
+  if(timeout.tv_usec < 0) {
+    timeout.tv_usec = 0;
+  }
   /* Create a descriptor set containing our two sockets.  */
   int rc = select(fd+1, &fds, NULL, NULL, &timeout);
         
@@ -38,7 +41,7 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
         printf("Send error\n");
         return 1;
       }
-      printf("Packet sent\n");
+      printf("Packet sent from relector\n");
     }
 
     if(queue->size == 0) {
