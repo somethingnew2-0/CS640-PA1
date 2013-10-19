@@ -104,6 +104,15 @@ int main(int argc, char *argv[]) {
   }
 
   Queue* queue = allocate();
+  // Wait for the first packet indefintely
+  Packet * packet = (Packet*)malloc(sizeof(Packet));
+  if(UDP_Read(fd, pingerAddr, packet, sizeof(Packet)) < 0) {
+    printf("Read error\n");
+    return 1;
+  }
+  printf("Packet received %lu\n", packet->timestamp);
+  enqueue(queue, packet);
+
   if(reflector(fd, pingerAddr, queue, delay) != 0)  {
     printf("Reflector error\n");
     return 1;
