@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
   lossProb = (lossProbStr == NULL) ? 0 : atoi(lossProbStr);
 
   /* initialize random seed: */
-  /*srand(time(NULL));*/
+  srand((int)getTimestamp());
   int fd;
   if((fd = UDP_Open(reflectorPort)) <= 0) {
     printf("UDP_Open error\n");
