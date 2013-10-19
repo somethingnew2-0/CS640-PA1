@@ -68,12 +68,34 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  Packet * packet = (Packet*)malloc(sizeof(Packet));
-  if(UDP_Read(fd, pingerAddr, packet, sizeof(Packet)) < 0) {
-    printf("Read error\n");
-    return 1;
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(fd, &fds);
+  
+  struct timeval timeout;
+  /* Set time limit. */
+  timeout.tv_sec = 5;
+  timeout.tv_usec = 0;
+  /* Create a descriptor set containing our two sockets.  */
+  int rc = select(fd+1, &fds, NULL, NULL, &timeout);
+        
+  /* select error */
+  if(rc < 0) {
+    return -1;
   }
-  printf("Packet received %lu\n", packet->timestamp);
+  /* No data in five seconds */        
+  else if (rc == 0) {
+    return -1;
+  }
+  /* Data is available */
+  else {
+    Packet * packet = (Packet*)malloc(sizeof(Packet));
+    if(UDP_Read(fd, pingerAddr, packet, sizeof(Packet)) < 0) {
+      printf("Read error\n");
+      return 1;
+    }
+    printf("Packet received %lu\n", packet->timestamp);
+  }
   
   UDP_Close(fd);
   return 0;
