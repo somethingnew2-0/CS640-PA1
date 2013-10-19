@@ -7,7 +7,7 @@
 /* A node in a linked list */
 typedef struct node {
 	/* a Packet of the node */
-	Packet * Packet;
+	Packet * packet;
 
 	/* the next node in the list */
 	struct node * next;
