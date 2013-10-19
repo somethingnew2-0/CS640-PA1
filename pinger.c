@@ -1,6 +1,7 @@
 /* The pinger sends a specified series of packets via UDP to the reflector */
 
 #include <ctype.h>
+#include <unistd.h>
 #include "host.h"
 #include "utility.h"
 #include "udp.h"
@@ -58,12 +59,15 @@ int main(int argc, char * argv[]) {
     printf("UDP_Fill error\n");
     return 1;
   }
-  packet = createPacket(0);
-  if(UDP_Write(fd, reflectorAddr, packet, sizeof(Packet)) < 0) {
-    printf("Send error\n");
-    return 1;
+
+  for (int i = 0; i < numPackets; i++) {
+    packet = createPacket(0);
+    if(UDP_Write(fd, reflectorAddr, packet, sizeof(Packet)) < 0) {
+      printf("Send error\n");
+      return 1;
+    }
+    printf("Packet sent\n");
   }
-  printf("Packet sent\n");
   UDP_Close(fd);
 
   return 0;

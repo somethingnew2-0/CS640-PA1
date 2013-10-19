@@ -1,5 +1,5 @@
 CC = gcc
-FLAGS = -g -c -pedantic -Wall
+FLAGS = -std=gnu99 -g -c -pedantic -Wall
 
 default : pinger.o reflector.o utility.o udp.o packet.o
 	$(CC) -o pinger pinger.o utility.o udp.o packet.o
