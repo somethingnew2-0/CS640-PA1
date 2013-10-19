@@ -7,3 +7,4 @@ Queue * allocate();
 void deallocate(Queue *queue);
 int enqueue(Queue *queue, Packet * packet);
 Packet * dequeue(Queue *queue);
+Packet * peek(Queue *queue);

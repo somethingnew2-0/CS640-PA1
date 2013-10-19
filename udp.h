@@ -1,3 +1,6 @@
+#ifndef UDP_H_
+#define UDP_H_
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -25,3 +28,5 @@ int UDP_Read(int fd, SockAddr *addr, void *buffer, int n);
 int UDP_Write(int fd, SockAddr *addr, void *buffer, int n);
 
 int UDP_FillSockAddr(SockAddr *addr, char *hostName, int port);
+
+#endif

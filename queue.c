@@ -1,5 +1,6 @@
-/* Implements a Queue structure and methods to allocate space for the queue, */
-/* enqueue, and dequeue*/
+/* Implements a Queue structure and methods to allocate space for the queue,
+ * enqueue, and dequeue
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include "queue.h"
@@ -77,8 +78,9 @@ int enqueue(Queue * queue, Packet * packet){
 	return queue->size;
 }
 
-/* Takes an item from the head of the queue and returns it. The pointer to*/
-/* head is incremented.*/
+/* Takes an item from the head of the queue and returns it. The pointer to
+ * head is incremented.
+ */
 Packet * dequeue(Queue * queue){
 	Node * temp;
 	Packet * packet;
@@ -96,3 +98,14 @@ Packet * dequeue(Queue * queue){
 	}
 	return packet;
 }
+
+/* Peeks at an item from the head of the queue and returns it. The pointer to
+ * head is unaffected.
+ */
+Packet * peek(Queue * queue){
+	if(NULL == queue || 0 == queue->size){
+		return NULL;
+	}
+	return queue->head->packet;
+}
+
