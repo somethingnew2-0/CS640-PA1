@@ -15,13 +15,8 @@ int main(int argc, char * argv[]) {
   int pingerPort;
   int reflectorPort;
   int numPackets;
-
-  Packet * packet;
-  struct sockaddr_in* reflectorAddr = 
-    (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
-  int fd;
+  
   int c;
-
   while((c = getopt(argc, argv, "p:s:r:n:")) != -1) {
     switch (c) {
     case 'p':
@@ -50,10 +45,14 @@ int main(int argc, char * argv[]) {
   reflectorPort = atoi(reflectorPortStr);
   numPackets = atoi(numPacketsStr);
 
+  int fd;
   if((fd = UDP_Open(pingerPort)) <= 0) {
     printf("UDP_Open error\n");
     return 1;
   }
+
+  struct sockaddr_in* reflectorAddr = 
+    (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
   printf("Open socket\n");
   if(UDP_FillSockAddr(reflectorAddr, hostname, reflectorPort) != 0) {
     printf("UDP_Fill error\n");
@@ -61,7 +60,7 @@ int main(int argc, char * argv[]) {
   }
 
   for (int i = 0; i < numPackets; i++) {
-    packet = createPacket(0);
+    Packet* packet = createPacket(0);
     if(UDP_Write(fd, reflectorAddr, packet, sizeof(Packet)) < 0) {
       printf("Send error\n");
       return 1;

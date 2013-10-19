@@ -6,7 +6,7 @@ int
 UDP_Open(int port)
 {
     int fd;
-    struct sockaddr_in myaddr;
+    SockAddr myaddr;
 
     if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
 	perror("socket");
@@ -30,14 +30,14 @@ UDP_Open(int port)
     return fd;
 }
 
-/* fill sockaddr_in struct with proper goodies */
+/* fill SockAddr struct with proper goodies */
 int
-UDP_FillSockAddr(struct sockaddr_in *addr, char *hostName, int port)
+UDP_FillSockAddr(SockAddr *addr, char *hostName, int port)
 {
     struct in_addr *inAddr;
     struct hostent *hostEntry;
 
-    bzero(addr, sizeof(struct sockaddr_in));
+    bzero(addr, sizeof(SockAddr));
     if (hostName == NULL) {
       return 0; /* it's OK just to clear the address */
     }
@@ -57,19 +57,19 @@ UDP_FillSockAddr(struct sockaddr_in *addr, char *hostName, int port)
 }
 
 int
-UDP_Write(int fd, struct sockaddr_in *addr, void *buffer, int n)
+UDP_Write(int fd, SockAddr *addr, void *buffer, int n)
 {
-    int addrLen = sizeof(struct sockaddr_in);
+    int addrLen = sizeof(SockAddr);
     int rc      = sendto(fd, buffer, n, 0, (struct sockaddr *) addr, addrLen);
     return rc;
 }
 
 int
-UDP_Read(int fd, struct sockaddr_in *addr, void *buffer, int n)
+UDP_Read(int fd, SockAddr *addr, void *buffer, int n)
 {
-    int len = sizeof(struct sockaddr_in); 
+    int len = sizeof(SockAddr); 
     int rc = recvfrom(fd, buffer, n, 0, (struct sockaddr *) addr, (socklen_t *) &len);
-    /* assert(len == sizeof(struct sockaddr_in)); */
+    /* assert(len == sizeof(struct SockAddr)); */
     return rc;
 }
 

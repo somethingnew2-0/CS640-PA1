@@ -15,6 +15,6 @@ struct packet {
 
 typedef struct packet Packet;
 
-Packet * createPacket(int num);
+Packet* createPacket(int num);
 void destroyPacket(Packet * packet);
 #endif /* Utility_H_ */

@@ -1,10 +1,3 @@
-#ifndef __UDP_h__
-#define __UDP_h__
-
-/*
- * includes
- */ 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -23,17 +16,12 @@
 #include <netinet/tcp.h>
 #include <netinet/in.h>
 
-/*
- * prototypes
- */ 
+typedef struct sockaddr_in SockAddr;
 
 int UDP_Open(int port);
 int UDP_Close(int fd);
 
-int UDP_Read(int fd, struct sockaddr_in *addr, void *buffer, int n);
-int UDP_Write(int fd, struct sockaddr_in *addr, void *buffer, int n);
+int UDP_Read(int fd, SockAddr *addr, void *buffer, int n);
+int UDP_Write(int fd, SockAddr *addr, void *buffer, int n);
 
-int UDP_FillSockAddr(struct sockaddr_in *addr, char *hostName, int port);
-
-#endif /* __UDP_h__ */
-
+int UDP_FillSockAddr(SockAddr *addr, char *hostName, int port);
