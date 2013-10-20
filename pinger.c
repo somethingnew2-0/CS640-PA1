@@ -18,10 +18,8 @@ void printAndRecordPacketInfo(Packet* packet, SockAddr* sockAddr, double* minRTT
     *maxRTT = rtt;
   }
 
-  printf("Packet received from reflector\n");
-  printf("Size: %i\n", sizeof(Packet));
-  printf("Reflector IP: %s\n", formatIP((sockAddr->sin_addr).s_addr));
-  printf("RTT: %.3fms\n", rtt);
+  printf("Packet received. Size: %lu, Reflector IP: %s, RTT: %.3fms\n", sizeof(Packet), 
+	 formatIP((sockAddr->sin_addr).s_addr), rtt);
 }
 
 int main(int argc, char * argv[]) {
