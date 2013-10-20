@@ -48,16 +48,9 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
   else if (rc == 0) {
     if(queue->size > 0) {
       QueuedPacket* queuedPacket = dequeue(queue);
-      printPacketInfo(queuedPacket);
-      if(dropPacket(lossProb)) {
-        printf("Packet dropped\n");
-      }
-      else { 
-        if(UDP_Write(fd, pingerAddr, queuedPacket->packet, sizeof(Packet)) < 0) {
-          printf("Send error\n");
-          return 1;
-        }
-        printf("Packet not dropped\n");
+      if(UDP_Write(fd, pingerAddr, queuedPacket->packet, sizeof(Packet)) < 0) {
+	printf("Send error\n");
+	return 1;
       }
       destroyQueuedPacket(queuedPacket);
       return reflector(fd, pingerAddr, queue, delay, lossProb);
@@ -69,12 +62,23 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
   /* Data is available */
   else {
     Packet * packet = (Packet*)malloc(sizeof(Packet));
+    QueuedPacket * queuedPacket;
     if(UDP_Read(fd, pingerAddr, packet, sizeof(Packet)) < 0) {
       printf("Read error\n");
       return 1;
     }
-    enqueue(queue, createQueuedPacket(packet, pingerAddr));
-    
+
+    queuedPacket = createQueuedPacket(packet, pingerAddr);
+    printPacketInfo(queuedPacket);
+    if(dropPacket(lossProb)) {
+      printf("Packet dropped\n");
+      destroyQueuedPacket(queuedPacket);
+    }
+    else {
+      printf("Packet not dropped\n");
+      enqueue(queue, queuedPacket);
+    }
+
     return reflector(fd, pingerAddr, queue, delay, lossProb);
   }  
 }
@@ -140,11 +144,21 @@ int main(int argc, char *argv[]) {
   Queue* queue = allocate();
   // Wait for the first packet indefintely
   Packet * packet = (Packet*)malloc(sizeof(Packet));
+  QueuedPacket * queuedPacket;
   if(UDP_Read(fd, pingerAddr, packet, sizeof(Packet)) < 0) {
     printf("Read error\n");
     return 1;
   }
-  enqueue(queue, createQueuedPacket(packet, pingerAddr));
+  queuedPacket = createQueuedPacket(packet, pingerAddr);
+  printPacketInfo(queuedPacket);
+  if(dropPacket(lossProb)) {
+    printf("Packet dropped\n");
+    destroyQueuedPacket(queuedPacket);
+  }
+  else {
+    printf("Packet not dropped\n");
+    enqueue(queue, queuedPacket);
+  }
 
   if(reflector(fd, pingerAddr, queue, delay, lossProb) != 0)  {
     printf("Reflector error\n");
