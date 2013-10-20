@@ -28,7 +28,7 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
   
   if(queue->size > 0) {
     timeout.tv_sec = 0;
-    timeout.tv_usec = (delay - (getTimestamp() - peek(queue)->timestamp)) * 1000;
+    timeout.tv_usec = (delay * 1000) - (getTimestamp() - peek(queue)->timestamp);
     if(timeout.tv_usec < 0) {
       timeout.tv_usec = 0;
     }
