@@ -25,20 +25,22 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
   
   struct timeval timeout;
   /* Set time limit. */
-  
+
+  int rc;
   if(queue->size > 0) {
     timeout.tv_sec = 0;
     timeout.tv_usec = (delay * 1000) - (getTimestamp() - peek(queue)->timestamp);
     if(timeout.tv_usec < 0) {
       timeout.tv_usec = 0;
     }
+
+    /* Create a descriptor set containing our two sockets.  */
+    rc = select(fd+1, &fds, NULL, NULL, &timeout);
   }
   else {
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 1500000;
+    /* Create a descriptor set containing our two sockets that runs indefinitely. */
+    rc = select(fd+1, &fds, NULL, NULL, NULL);
   }
-  /* Create a descriptor set containing our two sockets.  */
-  int rc = select(fd+1, &fds, NULL, NULL, &timeout);
         
   /* select error */
   if(rc < 0) {
@@ -141,22 +143,6 @@ int main(int argc, char *argv[]) {
   }
 
   Queue* queue = allocate();
-  // Wait for the first packet indefintely
-  Packet * packet = (Packet*)malloc(sizeof(Packet));
-  if(UDP_Read(fd, pingerAddr, packet, sizeof(Packet)) < 0) {
-    printf("Read error\n");
-    return 1;
-  }
-  QueuedPacket * queuedPacket = createQueuedPacket(packet, pingerAddr);
-  printPacketInfo(queuedPacket);
-  if(dropPacket(lossProb)) {
-    printf("Packet dropped\n");
-    destroyQueuedPacket(queuedPacket);
-  }
-  else {
-    printf("Packet not dropped\n");
-    enqueue(queue, queuedPacket);
-  }
 
   if(reflector(fd, pingerAddr, queue, delay, lossProb) != 0)  {
     printf("Reflector error\n");
