@@ -7,11 +7,11 @@
 #include "udp.h"
 #include "packet.h"
 
-void printAndRecordPacketInfo(Packet* packet, SockAddr* sockAddr, long* minRTT, 
-			      long* maxRTT, long* totalRTT) {
-  long rtt = getTimestamp() - packet->timestamp;
+void printAndRecordPacketInfo(Packet* packet, SockAddr* sockAddr, double* minRTT, 
+			      double* maxRTT, double* totalRTT) {
+  double rtt = (getTimestamp() - packet->timestamp)/1000.0;
   *totalRTT += rtt;
-  if(rtt < *minRTT && *minRTT >= 0) {
+  if(rtt < *minRTT || *minRTT < 0) {
     *minRTT = rtt;
   }
   if(rtt > *maxRTT) {
@@ -21,7 +21,7 @@ void printAndRecordPacketInfo(Packet* packet, SockAddr* sockAddr, long* minRTT,
   printf("Packet received from reflector\n");
   printf("Size: %i\n", sizeof(Packet));
   printf("Reflector IP: %s\n", formatIP((sockAddr->sin_addr).s_addr));
-  printf("RTT: %lu\n", rtt);
+  printf("RTT: %.3fms\n", rtt);
 }
 
 int main(int argc, char * argv[]) {
@@ -33,9 +33,9 @@ int main(int argc, char * argv[]) {
   int reflectorPort;
   int numPackets;
  
-  long minRTT = -1;
-  long maxRTT = -1;
-  long totalRTT = 0;
+  double minRTT = -1;
+  double maxRTT = -1;
+  double totalRTT = 0;
 
   int c;
   while((c = getopt(argc, argv, "p:s:r:n:")) != -1) {
@@ -132,11 +132,11 @@ int main(int argc, char * argv[]) {
   destroyPacket(recvPacket);
   UDP_Close(fd);
 
+
   printf("\nPackets sent: %d\n", numPackets);
   printf("Packets received: %d\n", packetsRecieved);
-  printf("Loss percentage: %f\n", 1 - ((double)packetsRecieved)/numPackets);
-  printf("RTT min/avg/max: %lu/%lu/%lu\n", minRTT/1000, 
-	 totalRTT/(packetsRecieved*1000), maxRTT/1000);
+  printf("Loss percentage: %.3f\n", 1 - ((double)packetsRecieved)/numPackets);
+  printf("RTT min/avg/max: %.3fms/%.3fms/%.3fms\n", minRTT, totalRTT/packetsRecieved, maxRTT);
 
   return 0;
 }
