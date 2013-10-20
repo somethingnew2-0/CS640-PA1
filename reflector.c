@@ -11,19 +11,8 @@ bool dropPacket(int lossProb) {
   return (rand() % 100 + 1) <= lossProb;
 }
 
-char* formatIP(uint32_t ip) {
-    unsigned char bytes[4];
-    bytes[0] = ip & 0xFF;
-    bytes[1] = (ip >> 8) & 0xFF;
-    bytes[2] = (ip >> 16) & 0xFF;
-    bytes[3] = (ip >> 24) & 0xFF; 
-    char* string = malloc(sizeof(char)*16);
-    sprintf(string, "%d.%d.%d.%d", bytes[0], bytes[1], bytes[2], bytes[3]);        
-    return string;
-}
-
 void printPacketInfo(QueuedPacket * queuedPacket) {
-  printf("Packet Received\n");
+  printf("Packet received from pinger\n");
   printf("Time: %lu\n", queuedPacket->timestamp);
   printf("Pinger IP: %s\n", formatIP(queuedPacket->ipAddress));
   printf("Sequence #: %lu\n", (unsigned long)queuedPacket->packet->sequence);
