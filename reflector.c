@@ -62,13 +62,12 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
   /* Data is available */
   else {
     Packet * packet = (Packet*)malloc(sizeof(Packet));
-    QueuedPacket * queuedPacket;
     if(UDP_Read(fd, pingerAddr, packet, sizeof(Packet)) < 0) {
       printf("Read error\n");
       return 1;
     }
 
-    queuedPacket = createQueuedPacket(packet, pingerAddr);
+    QueuedPacket * queuedPacket = createQueuedPacket(packet, pingerAddr);
     printPacketInfo(queuedPacket);
     if(dropPacket(lossProb)) {
       printf("Packet dropped\n");
@@ -144,12 +143,11 @@ int main(int argc, char *argv[]) {
   Queue* queue = allocate();
   // Wait for the first packet indefintely
   Packet * packet = (Packet*)malloc(sizeof(Packet));
-  QueuedPacket * queuedPacket;
   if(UDP_Read(fd, pingerAddr, packet, sizeof(Packet)) < 0) {
     printf("Read error\n");
     return 1;
   }
-  queuedPacket = createQueuedPacket(packet, pingerAddr);
+  QueuedPacket * queuedPacket = createQueuedPacket(packet, pingerAddr);
   printPacketInfo(queuedPacket);
   if(dropPacket(lossProb)) {
     printf("Packet dropped\n");
