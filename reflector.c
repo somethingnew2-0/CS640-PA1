@@ -14,7 +14,7 @@ bool dropPacket(int lossProb) {
 void printPacketInfo(QueuedPacket * queuedPacket) {
   printf("Packet received. Time: %lu, Pinger IP: %s, Sequence #: %lu, ", 
 	 queuedPacket->timestamp, formatIP(queuedPacket->ipAddress), 
-	 (unsigned long)queuedPacket->packet->sequence);
+	 (unsigned long)ntohl(queuedPacket->packet->sequence));
 }
 
 int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossProb) {

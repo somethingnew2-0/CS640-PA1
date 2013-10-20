@@ -36,6 +36,7 @@ int main(int argc, char * argv[]) {
   double totalRTT = 0;
 
   int c;
+  printf("%lu\n", sizeof(uint32_t));
   while((c = getopt(argc, argv, "p:s:r:n:")) != -1) {
     switch (c) {
     case 'p':

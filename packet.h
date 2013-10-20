@@ -12,7 +12,7 @@ typedef struct packet {
 
   /* Time in microseconds */
   long timestamp;
-} Packet;
+} __attribute__((__packed__)) Packet;
 
 typedef struct queuedpacket
 {

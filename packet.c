@@ -15,7 +15,7 @@ Packet* createPacket(int num) {
     exit(EXIT_FAILURE);
   }
 
-  packet->sequence = 2147483648L + num;
+  packet->sequence = htonl(2000000000L + num);
   
   packet->timestamp = getTimestamp();
   
