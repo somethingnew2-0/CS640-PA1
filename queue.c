@@ -1,8 +1,6 @@
 /* Implements a Queue structure and methods to allocate space for the queue,
  * enqueue, and dequeue
  */
-#include <stdio.h>
-#include <stdlib.h>
 #include "queue.h"
 
 /* Allocates memory for the queue and sets initial values */

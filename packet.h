@@ -2,12 +2,11 @@
 #ifndef PACKET_H_
 #define PACKET_H_
 
-#include <stdint.h>
-#include "utility.h"
 #include "udp.h"
+#include "utility.h"
 
 typedef struct packet {
-  /* The 32 bit sequence. Set so first bit is 1 */
+  /* The 32 bit sequence. */
   uint32_t sequence;
 
   /* Time in microseconds */

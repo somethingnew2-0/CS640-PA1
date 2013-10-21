@@ -1,11 +1,10 @@
 /* The reflector receives packets from the pinger and either returns 
  * them via UDP to the pinger or drops them.
  */
-#include "host.h"
-#include "utility.h"
-#include "udp.h"
 #include "packet.h"
 #include "queue.h"
+#include "udp.h"
+#include "utility.h"
 
 bool dropPacket(int lossProb) {
   return (rand() % 100 + 1) <= lossProb;
@@ -37,7 +36,7 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
     rc = select(fd+1, &fds, NULL, NULL, &timeout);
   }
   else {
-    /* Create a descriptor set containing our two sockets that runs indefinitely. */
+    /* Create a descriptor set containing our sockets that runs indefinitely. */
     rc = select(fd+1, &fds, NULL, NULL, NULL);
   }
         
@@ -49,7 +48,7 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
   else if (rc == 0) {
     if(queue->size > 0) {
       QueuedPacket* queuedPacket = dequeue(queue);
-      if(UDP_Write(fd, pingerAddr, queuedPacket->packet, sizeof(Packet)) < 0) {
+      if(udpWrite(fd, pingerAddr, queuedPacket->packet, sizeof(Packet)) < 0) {
 	printf("Send error\n");
 	return 1;
       }
@@ -63,7 +62,7 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
   /* Data is available */
   else {
     Packet * packet = (Packet*)malloc(sizeof(Packet));
-    if(UDP_Read(fd, pingerAddr, packet, sizeof(Packet)) < 0) {
+    if(udpRead(fd, pingerAddr, packet, sizeof(Packet)) < 0) {
       printf("Read error\n");
       return 1;
     }
@@ -129,14 +128,14 @@ int main(int argc, char *argv[]) {
   /* initialize random seed: */
   srand((int)getTimestamp());
   int fd;
-  if((fd = UDP_Open(reflectorPort)) <= 0) {
+  if((fd = udpOpen(reflectorPort)) <= 0) {
     printf("UDP_Open error\n");
     return 1;
   }
   
   SockAddr* pingerAddr = (SockAddr*)malloc(sizeof(SockAddr));
   printf("Open socket\n");
-  if(UDP_FillSockAddr(pingerAddr, hostname, pingerPort) != 0) {
+  if(udpFillSockAddr(pingerAddr, hostname, pingerPort) != 0) {
     printf("UDP_Fill error\n");
     return 1;
   }
@@ -150,7 +149,7 @@ int main(int argc, char *argv[]) {
 
   deallocate(queue);
 
-  UDP_Close(fd);
+  udpClose(fd);
   return 0;
 }
 

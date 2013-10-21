@@ -1,13 +1,10 @@
 /* The pinger sends a specified series of packets via UDP to the reflector */
 
-#include <ctype.h>
-#include <unistd.h>
-#include "host.h"
-#include "utility.h"
-#include "udp.h"
 #include "packet.h"
+#include "udp.h"
+#include "utility.h"
 
-void printAndRecordPacketInfo(Packet* packet, SockAddr* sockAddr, double* minRTT, 
+void printAndRecordPacketInfo(Packet* packet, SockAddr* sockAddr, double* minRTT,
 			      double* maxRTT, double* totalRTT) {
   double rtt = (getTimestamp() - packet->timestamp)/1000.0;
   *totalRTT += rtt;
@@ -18,8 +15,8 @@ void printAndRecordPacketInfo(Packet* packet, SockAddr* sockAddr, double* minRTT
     *maxRTT = rtt;
   }
 
-  printf("Packet received. Size: %lu, Reflector IP: %s, RTT: %.3fms\n", sizeof(Packet), 
-	 formatIP((sockAddr->sin_addr).s_addr), rtt);
+  printf("Packet received. Size: %lu, Reflector IP: %s, RTT: %.3fms\n", 
+	 sizeof(Packet), formatIP((sockAddr->sin_addr).s_addr), rtt);
 }
 
 int main(int argc, char * argv[]) {
@@ -65,14 +62,14 @@ int main(int argc, char * argv[]) {
   numPackets = atoi(numPacketsStr);
 
   int fd;
-  if((fd = UDP_Open(pingerPort)) <= 0) {
+  if((fd = udpOpen(pingerPort)) <= 0) {
     printf("UDP_Open error\n");
     return 1;
   }
 
   SockAddr* reflectorAddr =  (SockAddr*)malloc(sizeof(SockAddr));
   printf("Open socket\n");
-  if(UDP_FillSockAddr(reflectorAddr, hostname, reflectorPort) != 0) {
+  if(udpFillSockAddr(reflectorAddr, hostname, reflectorPort) != 0) {
     printf("UDP_Fill error\n");
     return 1;
   }
@@ -101,7 +98,7 @@ int main(int argc, char * argv[]) {
     else if (rc == 0) {
       /* Send the packet */
       Packet* sendPacket = createPacket(packetsSent++);
-      if(UDP_Write(fd, reflectorAddr, sendPacket, sizeof(Packet)) < 0) {
+      if(udpWrite(fd, reflectorAddr, sendPacket, sizeof(Packet)) < 0) {
 	printf("Send error\n");
 	return 1;
       }
@@ -114,11 +111,12 @@ int main(int argc, char * argv[]) {
     }
     /* Data is available */
     else {
-      if(UDP_Read(fd, reflectorAddr, recvPacket, sizeof(Packet)) < 0) {
+      if(udpRead(fd, reflectorAddr, recvPacket, sizeof(Packet)) < 0) {
 	printf("Read error\n");
 	return 1;
       }
-      printAndRecordPacketInfo(recvPacket, reflectorAddr, &minRTT, &maxRTT, &totalRTT);
+      printAndRecordPacketInfo(recvPacket, reflectorAddr, &minRTT, &maxRTT, 
+			       &totalRTT);
       packetsRecieved++;
       if(packetsSent >= numPackets) {
 	timeout.tv_sec = 3;
@@ -127,13 +125,14 @@ int main(int argc, char * argv[]) {
     }
   }
   destroyPacket(recvPacket);
-  UDP_Close(fd);
+  udpClose(fd);
 
 
   printf("\nPackets sent: %d\n", packetsSent);
   printf("Packets received: %d\n", packetsRecieved);
   printf("Loss percentage: %.3f\n", 1 - ((double)packetsRecieved)/packetsSent);
-  printf("RTT min/avg/max: %.3fms/%.3fms/%.3fms\n", minRTT, totalRTT/packetsRecieved, maxRTT);
+  printf("RTT min/avg/max: %.3fms/%.3fms/%.3fms\n", minRTT, 
+	 totalRTT/packetsRecieved, maxRTT);
 
   return 0;
 }
