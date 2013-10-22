@@ -61,6 +61,12 @@ int main(int argc, char * argv[]) {
   reflectorPort = atoi(reflectorPortStr);
   numPackets = atoi(numPacketsStr);
 
+  if(pingerPort < 1024 || pingerPort > 65536 || reflectorPort < 1024 || 
+     reflectorPort > 65536) {
+    printf("Invalid Port number\n");
+    return 1;
+  }
+
   /* Open the socket */
   int fd;
   if((fd = udpOpen(pingerPort)) <= 0) {

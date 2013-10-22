@@ -125,6 +125,12 @@ int main(int argc, char *argv[]) {
   delay = (delayStr == NULL) ? 0 : atoi(delayStr);
   lossProb = (lossProbStr == NULL) ? 0 : atoi(lossProbStr);
 
+  if(pingerPort < 1024 || pingerPort > 65536 || reflectorPort < 1024 ||
+     reflectorPort > 65536) {
+    printf("Invalid port number\n");
+    return 1;
+  }
+
   /* initialize random seed: */
   srand((int)getTimestamp());
 
