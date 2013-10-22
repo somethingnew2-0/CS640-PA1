@@ -6,13 +6,14 @@
 #include "udp.h"
 #include "utility.h"
 
+/* Determine if the current packet should be dropped */
 bool dropPacket(int lossProb) {
   return (rand() % 100 + 1) <= lossProb;
 }
 
 void printPacketInfo(QueuedPacket * queuedPacket) {
   printf("Packet received. Time: %lu, Pinger IP: %s, Sequence #: %lu, ", 
-	 queuedPacket->timestamp, formatIP(queuedPacket->ipAddress), 
+	 queuedPacket->timestamp/1000, formatIP(queuedPacket->ipAddress), 
 	 (unsigned long)ntohl(queuedPacket->packet->sequence));
 }
 
@@ -22,10 +23,9 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
   FD_SET(fd, &fds);
   
   struct timeval timeout;
-  /* Set time limit. */
-
   int rc;
   if(queue->size > 0) {
+    /* Set time limit. */
     timeout.tv_sec = 0;
     timeout.tv_usec = (delay * 1000) - (getTimestamp() - peek(queue)->timestamp);
     if(timeout.tv_usec < 0) {
@@ -46,22 +46,20 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
   }
   /* No data since timeout */        
   else if (rc == 0) {
-    if(queue->size > 0) {
-      QueuedPacket* queuedPacket = dequeue(queue);
-      if(udpWrite(fd, pingerAddr, queuedPacket->packet, sizeof(Packet)) < 0) {
-	printf("Send error\n");
-	return 1;
-      }
-      destroyQueuedPacket(queuedPacket);
-      return reflector(fd, pingerAddr, queue, delay, lossProb);
+    /* Send a packet to pinger */
+    QueuedPacket* queuedPacket = dequeue(queue);
+    if(udpWrite(fd, pingerAddr, queuedPacket->packet, sizeof(Packet)) < 0) {
+      printf("Send error\n");
+      return 1;
     }
-    else {
-      return 0;
-    }
+    destroyQueuedPacket(queuedPacket);
+
+    return reflector(fd, pingerAddr, queue, delay, lossProb);
   }
   /* Data is available */
   else {
     Packet * packet = (Packet*)malloc(sizeof(Packet));
+    checkMallocError(packet);
     if(udpRead(fd, pingerAddr, packet, sizeof(Packet)) < 0) {
       printf("Read error\n");
       return 1;
@@ -70,10 +68,12 @@ int reflector(int fd, SockAddr* pingerAddr, Queue* queue, int delay, int lossPro
     QueuedPacket * queuedPacket = createQueuedPacket(packet, pingerAddr);
     printPacketInfo(queuedPacket);
     if(dropPacket(lossProb)) {
+      /* If the packet is dropped, just delete it */
       printf("Dropped\n");
       destroyQueuedPacket(queuedPacket);
     }
     else {
+      /* else place the packet in the queue */
       printf("Not dropped\n");
       enqueue(queue, queuedPacket);
     }
@@ -127,29 +127,30 @@ int main(int argc, char *argv[]) {
 
   /* initialize random seed: */
   srand((int)getTimestamp());
+
+  /* Open the socket */
   int fd;
   if((fd = udpOpen(reflectorPort)) <= 0) {
-    printf("UDP_Open error\n");
     return 1;
   }
-  
-  SockAddr* pingerAddr = (SockAddr*)malloc(sizeof(SockAddr));
   printf("Open socket\n");
+
+  /* Fill address information */
+  SockAddr* pingerAddr = (SockAddr*)malloc(sizeof(SockAddr));
+  checkMallocError(pingerAddr);
   if(udpFillSockAddr(pingerAddr, hostname, pingerPort) != 0) {
-    printf("UDP_Fill error\n");
     return 1;
   }
 
   Queue* queue = allocate();
-
   if(reflector(fd, pingerAddr, queue, delay, lossProb) != 0)  {
     printf("Reflector error\n");
     return 1;
   }
 
   deallocate(queue);
-
   udpClose(fd);
+
   return 0;
 }
 

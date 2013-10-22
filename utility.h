@@ -19,5 +19,6 @@
 void checkFlagPresent(char flag, char* value);
 long getTimestamp();
 char* formatIP(uint32_t ip);
+void checkMallocError(void * object);
 
 #endif /* UTILITY_H_ */

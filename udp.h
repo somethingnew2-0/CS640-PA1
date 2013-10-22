@@ -1,3 +1,4 @@
+/* Functions used to setup a udp connection, send, and receive packets */
 #ifndef UDP_H_
 #define UDP_H_
 

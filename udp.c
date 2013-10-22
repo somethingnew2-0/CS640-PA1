@@ -52,17 +52,18 @@ int udpFillSockAddr(SockAddr *addr, char *hostName, int port) {
   return 0;
 }
 
+/* Send data */
 int udpWrite(int fd, SockAddr *addr, void *buffer, int n) {
   int addrLen = sizeof(SockAddr);
   int rc = sendto(fd, buffer, n, 0, (struct sockaddr *) addr, addrLen);
   return rc;
 }
 
+/* Receive data */
 int udpRead(int fd, SockAddr *addr, void *buffer, int n) {
   int len = sizeof(SockAddr); 
   int rc = recvfrom(fd, buffer, n, 0, (struct sockaddr *) addr, 
 		    (socklen_t *) &len);
-  /* assert(len == sizeof(struct SockAddr)); */
   return rc;
 }
 

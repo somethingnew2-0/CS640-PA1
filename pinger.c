@@ -61,23 +61,27 @@ int main(int argc, char * argv[]) {
   reflectorPort = atoi(reflectorPortStr);
   numPackets = atoi(numPacketsStr);
 
+  /* Open the socket */
   int fd;
   if((fd = udpOpen(pingerPort)) <= 0) {
-    printf("UDP_Open error\n");
     return 1;
   }
-
-  SockAddr* reflectorAddr =  (SockAddr*)malloc(sizeof(SockAddr));
   printf("Open socket\n");
+
+  /* Fill the socket address */
+  SockAddr* reflectorAddr = (SockAddr*)malloc(sizeof(SockAddr));
+  checkMallocError(reflectorAddr);
   if(udpFillSockAddr(reflectorAddr, hostname, reflectorPort) != 0) {
-    printf("UDP_Fill error\n");
     return 1;
   }
 
+  /* Set up a timeout for 1 second */
+  struct timeval timeout = {1, 0};
   int packetsSent = 0, packetsRecieved = 0;
   bool finished = false;
-  struct timeval timeout = {1, 0};
   Packet* recvPacket = (Packet*)malloc(sizeof(Packet));
+  checkMallocError(recvPacket);
+
   while(!finished) {
     fd_set fds;
     FD_ZERO(&fds);
@@ -105,12 +109,13 @@ int main(int argc, char * argv[]) {
       destroyPacket(sendPacket);
       printf("Packet sent from pinger\n");
 
-      /* Reset the packet */
+      /* Reset the timeout */
       timeout.tv_sec = (packetsSent < numPackets) ? 1 : 3;
       timeout.tv_usec = 0;
     }
     /* Data is available */
     else {
+      /* Receive a new packet */
       if(udpRead(fd, reflectorAddr, recvPacket, sizeof(Packet)) < 0) {
 	printf("Read error\n");
 	return 1;
@@ -119,14 +124,15 @@ int main(int argc, char * argv[]) {
 			       &totalRTT);
       packetsRecieved++;
       if(packetsSent >= numPackets) {
+	/* Reset the timeout */
 	timeout.tv_sec = 3;
 	timeout.tv_usec = 0;
       }
     }
   }
+
   destroyPacket(recvPacket);
   udpClose(fd);
-
 
   printf("\nPackets sent: %d\n", packetsSent);
   printf("Packets received: %d\n", packetsRecieved);

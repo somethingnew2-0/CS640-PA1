@@ -28,6 +28,14 @@ char* formatIP(uint32_t ip) {
   bytes[2] = (ip >> 16) & 0xFF;
   bytes[3] = (ip >> 24) & 0xFF;
   char* string = malloc(sizeof(char)*16);
+  checkMallocError(string);
   sprintf(string, "%d.%d.%d.%d", bytes[0], bytes[1], bytes[2], bytes[3]);
   return string;
+}
+
+void checkMallocError(void * object) {
+  if(object == NULL) {
+    printf("malloc error");
+    exit(EXIT_FAILURE);
+  }
 }
