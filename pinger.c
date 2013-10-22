@@ -134,11 +134,9 @@ int main(int argc, char * argv[]) {
   destroyPacket(recvPacket);
   udpClose(fd);
 
-  printf("\nPackets sent: %d\n", packetsSent);
-  printf("Packets received: %d\n", packetsRecieved);
-  printf("Loss percentage: %.3f\n", 1 - ((double)packetsRecieved)/packetsSent);
-  printf("RTT min/avg/max: %.3fms/%.3fms/%.3fms\n", minRTT, 
-	 totalRTT/packetsRecieved, maxRTT);
+  printf("\nPackets sent: %d, received: %d, Loss %%: %.3f, RTT min/avg/max: %.3fms/%.3fms/%.3fms\n", 
+	 packetsSent, packetsRecieved, 1 - ((double)packetsRecieved)/packetsSent, 
+	 minRTT, totalRTT/packetsRecieved, maxRTT);
 
   return 0;
 }
